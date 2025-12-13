@@ -49,15 +49,17 @@ void MainWindow::setPenTool()
     scribbleArea->setCurrentTool(ScribbleArea::Pen);
 }
 
-// Слоты для типов штриховки
+// ============================================================================
+// РЕАЛИЗАЦИЯ ВСЕХ МЕТОДОВ ДЛЯ ШТРИХОВКИ
+// ============================================================================
 
 // Металлы и твёрдые сплавы
 void MainWindow::setHatchingMetal()
 {
     scribbleArea->setCurrentTool(ScribbleArea::Hatching);
-    // Стандартные параметры для металлов
     scribbleArea->setHatchAngle(45);
     scribbleArea->setHatchSpacing(5);
+    scribbleArea->setCrossHatching(false);
 }
 
 // Неметаллические материалы
@@ -65,15 +67,17 @@ void MainWindow::setHatchingNonMetal()
 {
     scribbleArea->setCurrentTool(ScribbleArea::Hatching);
     scribbleArea->setHatchAngle(45);
-    scribbleArea->setHatchSpacing(5);
+    scribbleArea->setHatchSpacing(4);
+    scribbleArea->setCrossHatching(true);
 }
 
 // Древесина
 void MainWindow::setHatchingWood()
 {
     scribbleArea->setCurrentTool(ScribbleArea::Hatching);
-    scribbleArea->setHatchAngle(45);
-    scribbleArea->setHatchSpacing(5);
+    scribbleArea->setHatchAngle(0);
+    scribbleArea->setHatchSpacing(4);
+    scribbleArea->setCrossHatching(false);
 }
 
 // Камень естественный
@@ -81,7 +85,8 @@ void MainWindow::setHatchingStone()
 {
     scribbleArea->setCurrentTool(ScribbleArea::Hatching);
     scribbleArea->setHatchAngle(45);
-    scribbleArea->setHatchSpacing(5);
+    scribbleArea->setHatchSpacing(6);
+    scribbleArea->setCrossHatching(false);
 }
 
 // Керамика и силикатные материалы для кладки
@@ -90,6 +95,7 @@ void MainWindow::setHatchingCeramic()
     scribbleArea->setCurrentTool(ScribbleArea::Hatching);
     scribbleArea->setHatchAngle(45);
     scribbleArea->setHatchSpacing(5);
+    scribbleArea->setCrossHatching(false);
 }
 
 // Бетон
@@ -97,7 +103,8 @@ void MainWindow::setHatchingConcrete()
 {
     scribbleArea->setCurrentTool(ScribbleArea::Hatching);
     scribbleArea->setHatchAngle(45);
-    scribbleArea->setHatchSpacing(5);
+    scribbleArea->setHatchSpacing(8);
+    scribbleArea->setCrossHatching(false);
 }
 
 // Стекло и другие светопрозрачные материалы
@@ -105,7 +112,8 @@ void MainWindow::setHatchingGlass()
 {
     scribbleArea->setCurrentTool(ScribbleArea::Hatching);
     scribbleArea->setHatchAngle(45);
-    scribbleArea->setHatchSpacing(5);
+    scribbleArea->setHatchSpacing(12);
+    scribbleArea->setCrossHatching(false);
 }
 
 // Жидкости
@@ -113,7 +121,8 @@ void MainWindow::setHatchingLiquid()
 {
     scribbleArea->setCurrentTool(ScribbleArea::Hatching);
     scribbleArea->setHatchAngle(45);
-    scribbleArea->setHatchSpacing(5);
+    scribbleArea->setHatchSpacing(2);
+    scribbleArea->setCrossHatching(false);
 }
 
 // Грунт естественный
@@ -122,6 +131,7 @@ void MainWindow::setHatchingSoil()
     scribbleArea->setCurrentTool(ScribbleArea::Hatching);
     scribbleArea->setHatchAngle(45);
     scribbleArea->setHatchSpacing(5);
+    scribbleArea->setCrossHatching(false);
 }
 
 void MainWindow::save()
@@ -221,7 +231,9 @@ void MainWindow::createActions()
     penToolAct->setShortcut(tr("Ctrl+1"));
     connect(penToolAct, &QAction::triggered, this, &MainWindow::setPenTool);
 
-    // Действия для штриховки
+    // ========================================================================
+    // ДЕЙСТВИЯ ДЛЯ РАЗЛИЧНЫХ ТИПОВ ШТРИХОВКИ
+    // ========================================================================
 
     // Металлы и твёрдые сплавы
     hatchingMetalAct = new QAction(tr("&Металлы и твёрдые сплавы"), this);
@@ -272,7 +284,7 @@ void MainWindow::createActions()
     QActionGroup *toolGroup = new QActionGroup(this);
     toolGroup->addAction(penToolAct);
 
-    // Добавление типов штриховок в группу инструментов
+    // Добавляем все типы штриховки в группу инструментов
     toolGroup->addAction(hatchingMetalAct);
     toolGroup->addAction(hatchingNonMetalAct);
     toolGroup->addAction(hatchingWoodAct);
@@ -317,7 +329,9 @@ void MainWindow::createMenus()
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
 
-    // Подменю для штриховки
+    // ========================================================================
+    // СОЗДАНИЕ ПОДМЕНЮ ДЛЯ ШТРИХОВКИ
+    // ========================================================================
     hatchingSubMenu = new QMenu(tr("&Штриховка"), this);
     hatchingSubMenu->addAction(hatchingMetalAct);
     hatchingSubMenu->addAction(hatchingNonMetalAct);
@@ -332,7 +346,7 @@ void MainWindow::createMenus()
     // Меню инструментов
     toolsMenu = new QMenu(tr("&Инструменты"), this);
     toolsMenu->addAction(penToolAct);
-    toolsMenu->addMenu(hatchingSubMenu);  // Добавляем подменю штриховки
+    toolsMenu->addMenu(hatchingSubMenu);
 
     // Меню настроек
     optionMenu = new QMenu(tr("&Options"), this);

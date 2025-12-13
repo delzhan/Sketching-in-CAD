@@ -23,6 +23,7 @@ private slots:
     void about();
     void setPenTool();
 
+    // Слоты для различных типов штриховки
     void setHatchingMetal();
     void setHatchingNonMetal();
     void setHatchingWood();

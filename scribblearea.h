@@ -5,7 +5,6 @@
 #include <QImage>
 #include <QPoint>
 #include <QWidget>
-#include <QStack>
 
 class ScribbleArea : public QWidget
 {
@@ -23,6 +22,7 @@ public:
     void setCurrentTool(Tool newTool);
     void setHatchAngle(int angle);
     void setHatchSpacing(int spacing);
+    void setCrossHatching(bool cross);
 
     bool isModified() const { return modified; }
     QColor penColor() const { return myPenColor; }
@@ -42,12 +42,15 @@ protected:
 
 private:
     void drawLineTo(const QPoint &endPoint);
-    void hatchFill(const QPoint &startPoint); //Заливка
+    void hatchFill(const QPoint &startPoint);
     void resizeImage(QImage *image, const QSize &newSize);
 
     // Вспомогательные функции для заливки
     bool canHatchAt(int x, int y, const QColor &targetColor);
     void hatchArea(int startX, int startY, const QColor &targetColor);
+
+    // Метод для перекрестной штриховки
+    void drawCrossHatching(QImage &hatchImage, int width, int height);
 
     bool modified = false;
     bool scribbling = false;
@@ -60,6 +63,7 @@ private:
     // Параметры штриховки
     int hatchAngle = 45;
     int hatchSpacing = 10;
+    bool m_crossHatching = false;
 };
 
 #endif

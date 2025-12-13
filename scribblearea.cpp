@@ -43,6 +43,11 @@ void ScribbleArea::setHatchSpacing(int spacing)
     hatchSpacing = spacing;
 }
 
+void ScribbleArea::setCrossHatching(bool cross)
+{
+    m_crossHatching = cross;
+}
+
 bool ScribbleArea::openImage(const QString &fileName)
 {
     QImage loadedImage;
@@ -173,9 +178,56 @@ bool ScribbleArea::canHatchAt(int x, int y, const QColor &targetColor)
     return pixelColor == targetColor;
 }
 
+void ScribbleArea::drawCrossHatching(QImage &hatchImage, int width, int height)
+{
+    QPainter painter(&hatchImage);
+    painter.setPen(QPen(myPenColor, myPenWidth));
+
+    // Вычисляем диагональ области для полного покрытия
+    int diagonal = qSqrt(width * width + height * height);
+
+    double angle1Rad = qDegreesToRadians((double)hatchAngle);
+    double cosAngle1 = qCos(angle1Rad);
+    double sinAngle1 = qSin(angle1Rad);
+
+    double angle2Rad = qDegreesToRadians((double)-hatchAngle);
+    double cosAngle2 = qCos(angle2Rad);
+    double sinAngle2 = qSin(angle2Rad);
+
+    // Рисуем первый набор линий (основное направление)
+    for (int i = -diagonal; i < diagonal; i += hatchSpacing) {
+        QPointF p1, p2;
+
+        if (qAbs(sinAngle1) > qAbs(cosAngle1)) {
+            p1 = QPointF(i / sinAngle1, 0);
+            p2 = QPointF((i - height * cosAngle1) / sinAngle1, height);
+        } else {
+            p1 = QPointF(0, i / cosAngle1);
+            p2 = QPointF(width, (i - width * sinAngle1) / cosAngle1);
+        }
+
+        painter.drawLine(p1, p2);
+    }
+
+    // Рисуем второй набор линий (перпендикулярно первому)
+    for (int i = -diagonal; i < diagonal; i += hatchSpacing) {
+        QPointF p1, p2;
+
+        if (qAbs(sinAngle2) > qAbs(cosAngle2)) {
+            p1 = QPointF(i / sinAngle2, 0);
+            p2 = QPointF((i - height * cosAngle2) / sinAngle2, height);
+        } else {
+            p1 = QPointF(0, i / cosAngle2);
+            p2 = QPointF(width, (i - width * sinAngle2) / cosAngle2);
+        }
+
+        painter.drawLine(p1, p2);
+    }
+}
+
 void ScribbleArea::hatchArea(int startX, int startY, const QColor &targetColor)
 {
-    // Алгоритм заливки с затравкой (Flood Fill)
+    // Алгоритм Flood Fill
     std::stack<QPoint> stack;
     stack.push(QPoint(startX, startY));
 
@@ -222,37 +274,36 @@ void ScribbleArea::hatchArea(int startX, int startY, const QColor &targetColor)
     int width = maxX - minX + 1;
     int height = maxY - minY + 1;
 
-    // Создаем временное изображение для штриховки
     QImage hatchImage(width, height, QImage::Format_ARGB32);
     hatchImage.fill(Qt::transparent);
 
-    QPainter hatchPainter(&hatchImage);
-    hatchPainter.setPen(QPen(myPenColor, myPenWidth));
+    if (m_crossHatching) {
+        drawCrossHatching(hatchImage, width, height);
+    } else {
+        QPainter painter(&hatchImage);
+        painter.setPen(QPen(myPenColor, myPenWidth));
 
-    // Параметры для поворота штриховки
-    double angleRad = qDegreesToRadians((double)hatchAngle);
-    double cosAngle = qCos(angleRad);
-    double sinAngle = qSin(angleRad);
+        double angleRad = qDegreesToRadians((double)hatchAngle);
+        double cosAngle = qCos(angleRad);
+        double sinAngle = qSin(angleRad);
 
-    // Диагональ области для полного покрытия
-    int diagonal = qSqrt(width * width + height * height);
+        int diagonal = qSqrt(width * width + height * height);
 
-    // Рисуем линии штриховки во временном изображении
-    for (int i = -diagonal; i < diagonal; i += hatchSpacing) {
-        QPointF p1, p2;
+        for (int i = -diagonal; i < diagonal; i += hatchSpacing) {
+            QPointF p1, p2;
 
-        if (qAbs(sinAngle) > qAbs(cosAngle)) {
-            p1 = QPointF(i / sinAngle, 0);
-            p2 = QPointF((i - height * cosAngle) / sinAngle, height);
-        } else {
-            p1 = QPointF(0, i / cosAngle);
-            p2 = QPointF(width, (i - width * sinAngle) / cosAngle);
+            if (qAbs(sinAngle) > qAbs(cosAngle)) {
+                p1 = QPointF(i / sinAngle, 0);
+                p2 = QPointF((i - height * cosAngle) / sinAngle, height);
+            } else {
+                p1 = QPointF(0, i / cosAngle);
+                p2 = QPointF(width, (i - width * sinAngle) / cosAngle);
+            }
+
+            painter.drawLine(p1, p2);
         }
-
-        hatchPainter.drawLine(p1, p2);
     }
 
-    // Возвращаем пиксели, не затрагивая контур штриховки
     for (const QPoint &p : areaPixels) {
         int localX = p.x() - minX;
         int localY = p.y() - minY;
@@ -260,8 +311,6 @@ void ScribbleArea::hatchArea(int startX, int startY, const QColor &targetColor)
         if (localX >= 0 && localX < width && localY >= 0 && localY < height) {
             QColor hatchColor = hatchImage.pixelColor(localX, localY);
 
-            // Копируем цвет только если пиксель в hatchImage не прозрачный
-            // и если этот пиксель действительно внутри области
             if (hatchColor.alpha() > 0) {
                 image.setPixelColor(p, hatchColor);
             }
