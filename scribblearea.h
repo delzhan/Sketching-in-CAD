@@ -21,8 +21,8 @@ public:
     void setPenColor(const QColor &newColor);
     void setPenWidth(int newWidth);
     void setCurrentTool(Tool newTool);
-    void setHatchAngle(int angle);  // Новый метод для установки угла штриховки
-    void setHatchSpacing(int spacing); // Новый метод для установки расстояния между линиями
+    void setHatchAngle(int angle);
+    void setHatchSpacing(int spacing);
 
     bool isModified() const { return modified; }
     QColor penColor() const { return myPenColor; }
@@ -42,7 +42,7 @@ protected:
 
 private:
     void drawLineTo(const QPoint &endPoint);
-    void hatchFill(const QPoint &startPoint);  // Новая функция для заливки штриховкой
+    void hatchFill(const QPoint &startPoint); //Заливка
     void resizeImage(QImage *image, const QSize &newSize);
 
     // Вспомогательные функции для заливки
@@ -58,8 +58,8 @@ private:
     Tool m_currentTool = Pen;
 
     // Параметры штриховки
-    int hatchAngle = 45;      // Угол штриховки в градусах
-    int hatchSpacing = 10;    // Расстояние между линиями штриховки
+    int hatchAngle = 45;
+    int hatchSpacing = 10;
 };
 
 #endif

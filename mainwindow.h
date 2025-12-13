@@ -23,7 +23,6 @@ private slots:
     void about();
     void setPenTool();
 
-    // Слоты для различных типов штриховки
     void setHatchingMetal();
     void setHatchingNonMetal();
     void setHatchingWood();
@@ -34,7 +33,6 @@ private slots:
     void setHatchingLiquid();
     void setHatchingSoil();
 
-    // Настройки штриховки
     void setHatchAngle();
     void setHatchSpacing();
 
@@ -51,12 +49,11 @@ private:
     QMenu *fileMenu;
     QMenu *optionMenu;
     QMenu *helpMenu;
-    QMenu *hatchingSubMenu;  // Подменю для штриховки
+    QMenu *hatchingSubMenu;
 
     QList<QAction *> saveAsActs;
     QAction *penToolAct;
 
-    // Действия для различных типов штриховки
     QAction *hatchingMetalAct;
     QAction *hatchingNonMetalAct;
     QAction *hatchingWoodAct;

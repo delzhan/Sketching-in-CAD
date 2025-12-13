@@ -24,7 +24,6 @@ ScribbleArea::ScribbleArea(QWidget *parent)
 {
     setAttribute(Qt::WA_StaticContents);
 
-    // Инициализация изображения белым цветом
     image = QImage(500, 500, QImage::Format_ARGB32);
     image.fill(Qt::white);
 }
@@ -223,12 +222,6 @@ void ScribbleArea::hatchArea(int startX, int startY, const QColor &targetColor)
     int width = maxX - minX + 1;
     int height = maxY - minY + 1;
 
-    // ========================================================================
-    // ИЗМЕНЕНИЕ: Вместо использования маски с CompositionMode_DestinationIn,
-    // мы создадим отдельное изображение для штриховки и скопируем только
-    // нужные пиксели, не затрагивая контур
-    // ========================================================================
-
     // Создаем временное изображение для штриховки
     QImage hatchImage(width, height, QImage::Format_ARGB32);
     hatchImage.fill(Qt::transparent);
@@ -236,12 +229,12 @@ void ScribbleArea::hatchArea(int startX, int startY, const QColor &targetColor)
     QPainter hatchPainter(&hatchImage);
     hatchPainter.setPen(QPen(myPenColor, myPenWidth));
 
-    // Вычисляем параметры для поворота штриховки
+    // Параметры для поворота штриховки
     double angleRad = qDegreesToRadians((double)hatchAngle);
     double cosAngle = qCos(angleRad);
     double sinAngle = qSin(angleRad);
 
-    // Вычисляем диагональ области для полного покрытия
+    // Диагональ области для полного покрытия
     int diagonal = qSqrt(width * width + height * height);
 
     // Рисуем линии штриховки во временном изображении
@@ -259,8 +252,7 @@ void ScribbleArea::hatchArea(int startX, int startY, const QColor &targetColor)
         hatchPainter.drawLine(p1, p2);
     }
 
-    // Теперь копируем только те пиксели из hatchImage, которые соответствуют
-    // пикселям области (areaPixels), не затрагивая контур
+    // Возвращаем пиксели, не затрагивая контур штриховки
     for (const QPoint &p : areaPixels) {
         int localX = p.x() - minX;
         int localY = p.y() - minY;
@@ -275,10 +267,6 @@ void ScribbleArea::hatchArea(int startX, int startY, const QColor &targetColor)
             }
         }
     }
-
-    // ========================================================================
-    // КОНЕЦ ИЗМЕНЕНИЙ
-    // ========================================================================
 }
 
 void ScribbleArea::resizeImage(QImage *image, const QSize &newSize)
