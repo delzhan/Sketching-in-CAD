@@ -1,8 +1,5 @@
-// Copyright (C) 2016 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
-
 #include "mainwindow.h"
-#include "scribblearea.h"
+#include "paintview.h"
 
 #include <QApplication>
 #include <QColorDialog>
@@ -15,9 +12,9 @@
 #include <QCloseEvent>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), scribbleArea(new ScribbleArea(this))
+    : QMainWindow(parent), paintView(new PaintView(this))
 {
-    setCentralWidget(scribbleArea);
+    setCentralWidget(paintView);
 
     createActions();
     createMenus();
@@ -40,98 +37,72 @@ void MainWindow::open()
         QString fileName = QFileDialog::getOpenFileName(this,
                                                         tr("Open File"), QDir::currentPath());
         if (!fileName.isEmpty())
-            scribbleArea->openImage(fileName);
+            paintView->openImage(fileName);
     }
 }
 
 void MainWindow::setPenTool()
 {
-    scribbleArea->setCurrentTool(ScribbleArea::Pen);
+    paintView->usePencilTool();
 }
 
-// ============================================================================
-// РЕАЛИЗАЦИЯ ВСЕХ МЕТОДОВ ДЛЯ ШТРИХОВКИ
-// ============================================================================
+void MainWindow::setHatchingTool()
+{
+    paintView->useHatchingTool();
+}
 
-// Металлы и твёрдые сплавы
 void MainWindow::setHatchingMetal()
 {
-    scribbleArea->setCurrentTool(ScribbleArea::Hatching);
-    scribbleArea->setHatchAngle(45);
-    scribbleArea->setHatchSpacing(5);
-    scribbleArea->setCrossHatching(false);
+    paintView->useHatchingTool();
+    paintView->setHatchType(HatchingTool::Metal);
 }
 
-// Неметаллические материалы
 void MainWindow::setHatchingNonMetal()
 {
-    scribbleArea->setCurrentTool(ScribbleArea::Hatching);
-    scribbleArea->setHatchAngle(45);
-    scribbleArea->setHatchSpacing(4);
-    scribbleArea->setCrossHatching(true);
+    paintView->useHatchingTool();
+    paintView->setHatchType(HatchingTool::NonMetal);
 }
 
-// Древесина
 void MainWindow::setHatchingWood()
 {
-    scribbleArea->setCurrentTool(ScribbleArea::Hatching);
-    scribbleArea->setHatchAngle(0);
-    scribbleArea->setHatchSpacing(4);
-    scribbleArea->setCrossHatching(false);
+    paintView->useHatchingTool();
+    paintView->setHatchType(HatchingTool::Wood);
 }
 
-// Камень естественный
 void MainWindow::setHatchingStone()
 {
-    scribbleArea->setCurrentTool(ScribbleArea::Hatching);
-    scribbleArea->setHatchAngle(45);
-    scribbleArea->setHatchSpacing(6);
-    scribbleArea->setCrossHatching(false);
+    paintView->useHatchingTool();
+    paintView->setHatchType(HatchingTool::Stone);
 }
 
-// Керамика и силикатные материалы для кладки
 void MainWindow::setHatchingCeramic()
 {
-    scribbleArea->setCurrentTool(ScribbleArea::Hatching);
-    scribbleArea->setHatchAngle(45);
-    scribbleArea->setHatchSpacing(5);
-    scribbleArea->setCrossHatching(false);
+    paintView->useHatchingTool();
+    paintView->setHatchType(HatchingTool::Ceramic);
 }
 
-// Бетон
 void MainWindow::setHatchingConcrete()
 {
-    scribbleArea->setCurrentTool(ScribbleArea::Hatching);
-    scribbleArea->setHatchAngle(45);
-    scribbleArea->setHatchSpacing(8);
-    scribbleArea->setCrossHatching(false);
+    paintView->useHatchingTool();
+    paintView->setHatchType(HatchingTool::Concrete);
 }
 
-// Стекло и другие светопрозрачные материалы
 void MainWindow::setHatchingGlass()
 {
-    scribbleArea->setCurrentTool(ScribbleArea::Hatching);
-    scribbleArea->setHatchAngle(45);
-    scribbleArea->setHatchSpacing(12);
-    scribbleArea->setCrossHatching(false);
+    paintView->useHatchingTool();
+    paintView->setHatchType(HatchingTool::Glass);
 }
 
-// Жидкости
 void MainWindow::setHatchingLiquid()
 {
-    scribbleArea->setCurrentTool(ScribbleArea::Hatching);
-    scribbleArea->setHatchAngle(45);
-    scribbleArea->setHatchSpacing(2);
-    scribbleArea->setCrossHatching(false);
+    paintView->useHatchingTool();
+    paintView->setHatchType(HatchingTool::Liquid);
 }
 
-// Грунт естественный
 void MainWindow::setHatchingSoil()
 {
-    scribbleArea->setCurrentTool(ScribbleArea::Hatching);
-    scribbleArea->setHatchAngle(45);
-    scribbleArea->setHatchSpacing(5);
-    scribbleArea->setCrossHatching(false);
+    paintView->useHatchingTool();
+    paintView->setHatchType(HatchingTool::Soil);
 }
 
 void MainWindow::save()
@@ -143,9 +114,9 @@ void MainWindow::save()
 
 void MainWindow::penColor()
 {
-    QColor newColor = QColorDialog::getColor(scribbleArea->penColor());
+    QColor newColor = QColorDialog::getColor(paintView->penColor());
     if (newColor.isValid())
-        scribbleArea->setPenColor(newColor);
+        paintView->setPenColor(newColor);
 }
 
 void MainWindow::penWidth()
@@ -153,10 +124,10 @@ void MainWindow::penWidth()
     bool ok;
     int newWidth = QInputDialog::getInt(this, tr("Scribble"),
                                         tr("Select pen width:"),
-                                        scribbleArea->penWidth(),
+                                        paintView->penWidth(),
                                         1, 50, 1, &ok);
     if (ok)
-        scribbleArea->setPenWidth(newWidth);
+        paintView->setPenWidth(newWidth);
 }
 
 void MainWindow::setHatchAngle()
@@ -166,7 +137,7 @@ void MainWindow::setHatchAngle()
                                      tr("Введите угол штриховки (0-180 градусов):"),
                                      45, 0, 180, 1, &ok);
     if (ok)
-        scribbleArea->setHatchAngle(angle);
+        paintView->setHatchAngle(angle);
 }
 
 void MainWindow::setHatchSpacing()
@@ -176,7 +147,7 @@ void MainWindow::setHatchSpacing()
                                        tr("Введите расстояние между линиями штриховки:"),
                                        10, 1, 50, 1, &ok);
     if (ok)
-        scribbleArea->setHatchSpacing(spacing);
+        paintView->setHatchSpacing(spacing);
 }
 
 void MainWindow::about()
@@ -211,9 +182,6 @@ void MainWindow::createActions()
         saveAsActs.append(action);
     }
 
-    printAct = new QAction(tr("&Print..."), this);
-    connect(printAct, &QAction::triggered, scribbleArea, &ScribbleArea::print);
-
     exitAct = new QAction(tr("E&xit"), this);
     exitAct->setShortcuts(QKeySequence::Quit);
     connect(exitAct, &QAction::triggered, this, &MainWindow::close);
@@ -224,67 +192,56 @@ void MainWindow::createActions()
     penWidthAct = new QAction(tr("Pen &Width..."), this);
     connect(penWidthAct, &QAction::triggered, this, &MainWindow::penWidth);
 
-    // Инструмент "Карандаш"
     penToolAct = new QAction(tr("&Карандаш"), this);
     penToolAct->setCheckable(true);
     penToolAct->setChecked(true);
     penToolAct->setShortcut(tr("Ctrl+1"));
     connect(penToolAct, &QAction::triggered, this, &MainWindow::setPenTool);
 
-    // ========================================================================
-    // ДЕЙСТВИЯ ДЛЯ РАЗЛИЧНЫХ ТИПОВ ШТРИХОВКИ
-    // ========================================================================
+    hatchingToolAct = new QAction(tr("&Штриховка"), this);
+    hatchingToolAct->setCheckable(true);
+    hatchingToolAct->setShortcut(tr("Ctrl+2"));
+    connect(hatchingToolAct, &QAction::triggered, this, &MainWindow::setHatchingTool);
 
-    // Металлы и твёрдые сплавы
     hatchingMetalAct = new QAction(tr("&Металлы и твёрдые сплавы"), this);
     hatchingMetalAct->setCheckable(true);
     connect(hatchingMetalAct, &QAction::triggered, this, &MainWindow::setHatchingMetal);
 
-    // Неметаллические материалы
     hatchingNonMetalAct = new QAction(tr("&Неметаллические материалы"), this);
     hatchingNonMetalAct->setCheckable(true);
     connect(hatchingNonMetalAct, &QAction::triggered, this, &MainWindow::setHatchingNonMetal);
 
-    // Древесина
     hatchingWoodAct = new QAction(tr("&Древесина"), this);
     hatchingWoodAct->setCheckable(true);
     connect(hatchingWoodAct, &QAction::triggered, this, &MainWindow::setHatchingWood);
 
-    // Камень естественный
     hatchingStoneAct = new QAction(tr("&Камень естественный"), this);
     hatchingStoneAct->setCheckable(true);
     connect(hatchingStoneAct, &QAction::triggered, this, &MainWindow::setHatchingStone);
 
-    // Керамика и силикатные материалы для кладки
     hatchingCeramicAct = new QAction(tr("&Керамика и силикатные материалы"), this);
     hatchingCeramicAct->setCheckable(true);
     connect(hatchingCeramicAct, &QAction::triggered, this, &MainWindow::setHatchingCeramic);
 
-    // Бетон
     hatchingConcreteAct = new QAction(tr("&Бетон"), this);
     hatchingConcreteAct->setCheckable(true);
     connect(hatchingConcreteAct, &QAction::triggered, this, &MainWindow::setHatchingConcrete);
 
-    // Стекло и другие светопрозрачные материалы
     hatchingGlassAct = new QAction(tr("&Стекло и светопрозрачные материалы"), this);
     hatchingGlassAct->setCheckable(true);
     connect(hatchingGlassAct, &QAction::triggered, this, &MainWindow::setHatchingGlass);
 
-    // Жидкости
     hatchingLiquidAct = new QAction(tr("&Жидкости"), this);
     hatchingLiquidAct->setCheckable(true);
     connect(hatchingLiquidAct, &QAction::triggered, this, &MainWindow::setHatchingLiquid);
 
-    // Грунт естественный
     hatchingSoilAct = new QAction(tr("&Грунт естественный"), this);
     hatchingSoilAct->setCheckable(true);
     connect(hatchingSoilAct, &QAction::triggered, this, &MainWindow::setHatchingSoil);
 
-    // Создаем группу действий для инструментов
     QActionGroup *toolGroup = new QActionGroup(this);
     toolGroup->addAction(penToolAct);
-
-    // Добавляем все типы штриховки в группу инструментов
+    toolGroup->addAction(hatchingToolAct);
     toolGroup->addAction(hatchingMetalAct);
     toolGroup->addAction(hatchingNonMetalAct);
     toolGroup->addAction(hatchingWoodAct);
@@ -294,10 +251,8 @@ void MainWindow::createActions()
     toolGroup->addAction(hatchingGlassAct);
     toolGroup->addAction(hatchingLiquidAct);
     toolGroup->addAction(hatchingSoilAct);
-
     toolGroup->setExclusive(true);
 
-    // Действия для настройки штриховки
     hatchAngleAct = new QAction(tr("Угол &штриховки..."), this);
     connect(hatchAngleAct, &QAction::triggered, this, &MainWindow::setHatchAngle);
 
@@ -307,7 +262,7 @@ void MainWindow::createActions()
     clearScreenAct = new QAction(tr("&Clear Screen"), this);
     clearScreenAct->setShortcut(tr("Ctrl+L"));
     connect(clearScreenAct, &QAction::triggered,
-            scribbleArea, &ScribbleArea::clearImage);
+            paintView, &PaintView::clearImage);
 
     aboutAct = new QAction(tr("&About"), this);
     connect(aboutAct, &QAction::triggered, this, &MainWindow::about);
@@ -325,13 +280,9 @@ void MainWindow::createMenus()
     fileMenu = new QMenu(tr("&File"), this);
     fileMenu->addAction(openAct);
     fileMenu->addMenu(saveAsMenu);
-    fileMenu->addAction(printAct);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
 
-    // ========================================================================
-    // СОЗДАНИЕ ПОДМЕНЮ ДЛЯ ШТРИХОВКИ
-    // ========================================================================
     hatchingSubMenu = new QMenu(tr("&Штриховка"), this);
     hatchingSubMenu->addAction(hatchingMetalAct);
     hatchingSubMenu->addAction(hatchingNonMetalAct);
@@ -343,24 +294,20 @@ void MainWindow::createMenus()
     hatchingSubMenu->addAction(hatchingLiquidAct);
     hatchingSubMenu->addAction(hatchingSoilAct);
 
-    // Меню инструментов
     toolsMenu = new QMenu(tr("&Инструменты"), this);
     toolsMenu->addAction(penToolAct);
+    toolsMenu->addAction(hatchingToolAct);
     toolsMenu->addMenu(hatchingSubMenu);
 
-    // Меню настроек
     optionMenu = new QMenu(tr("&Options"), this);
     optionMenu->addAction(penColorAct);
     optionMenu->addAction(penWidthAct);
     optionMenu->addSeparator();
-
     optionMenu->addAction(hatchAngleAct);
     optionMenu->addAction(hatchSpacingAct);
-
     optionMenu->addSeparator();
     optionMenu->addAction(clearScreenAct);
 
-    // Меню помощи
     helpMenu = new QMenu(tr("&Help"), this);
     helpMenu->addAction(aboutAct);
     helpMenu->addAction(aboutQtAct);
@@ -373,7 +320,7 @@ void MainWindow::createMenus()
 
 bool MainWindow::maybeSave()
 {
-    if (scribbleArea->isModified()) {
+    if (paintView->isModified()) {
         QMessageBox::StandardButton ret;
         ret = QMessageBox::warning(this, tr("Scribble"),
                                    tr("The image has been modified.\n"
@@ -399,5 +346,5 @@ bool MainWindow::saveFile(const QByteArray &fileFormat)
                                                         .arg(QString::fromLatin1(fileFormat)));
     if (fileName.isEmpty())
         return false;
-    return scribbleArea->saveImage(fileName, fileFormat.constData());
+    return paintView->saveImage(fileName, fileFormat.constData());
 }

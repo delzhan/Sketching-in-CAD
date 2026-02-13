@@ -4,7 +4,8 @@
 #include <QList>
 #include <QMainWindow>
 
-class ScribbleArea;
+class PaintView;
+class HatchingTool;
 
 class MainWindow : public QMainWindow
 {
@@ -22,8 +23,8 @@ private slots:
     void penWidth();
     void about();
     void setPenTool();
+    void setHatchingTool();
 
-    // Слоты для различных типов штриховки
     void setHatchingMetal();
     void setHatchingNonMetal();
     void setHatchingWood();
@@ -43,7 +44,7 @@ private:
     bool maybeSave();
     bool saveFile(const QByteArray &fileFormat);
 
-    ScribbleArea *scribbleArea;
+    PaintView *paintView;
 
     QMenu *toolsMenu;
     QMenu *saveAsMenu;
@@ -54,6 +55,7 @@ private:
 
     QList<QAction *> saveAsActs;
     QAction *penToolAct;
+    QAction *hatchingToolAct;
 
     QAction *hatchingMetalAct;
     QAction *hatchingNonMetalAct;
@@ -69,7 +71,6 @@ private:
     QAction *exitAct;
     QAction *penColorAct;
     QAction *penWidthAct;
-    QAction *printAct;
     QAction *clearScreenAct;
     QAction *aboutAct;
     QAction *aboutQtAct;
