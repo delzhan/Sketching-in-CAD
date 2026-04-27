@@ -6,9 +6,8 @@ PencilTool::PencilTool(QObject *parent) : Tool(parent)
 {
 }
 
-void PencilTool::onMousePress(QMouseEvent *event, QPainter &painter, const QPoint &lastPoint)
+void PencilTool::onMousePress(QMouseEvent *event, QPainter &painter)
 {
-    Q_UNUSED(lastPoint);
     if (event->button() == Qt::LeftButton) {
         m_scribbling = true;
         m_lastPoint = event->pos();
@@ -18,26 +17,24 @@ void PencilTool::onMousePress(QMouseEvent *event, QPainter &painter, const QPoin
     }
 }
 
-void PencilTool::onMouseMove(QMouseEvent *event, QPainter &painter, const QPoint &lastPoint)
+void PencilTool::onMouseMove(QMouseEvent *event, QPainter &painter)
 {
-    Q_UNUSED(lastPoint);
     if ((event->buttons() & Qt::LeftButton) && m_scribbling) {
-        drawLineTo(event->pos(), painter, m_lastPoint);
+        drawLineTo(event->pos(), painter);
         m_lastPoint = event->pos();
     }
 }
 
-void PencilTool::onMouseRelease(QMouseEvent *event, QPainter &painter, const QPoint &lastPoint)
+void PencilTool::onMouseRelease(QMouseEvent *event, QPainter &painter)
 {
-    Q_UNUSED(lastPoint);
     if (event->button() == Qt::LeftButton && m_scribbling) {
-        drawLineTo(event->pos(), painter, m_lastPoint);
+        drawLineTo(event->pos(), painter);
         m_scribbling = false;
     }
 }
 
-void PencilTool::drawLineTo(const QPoint &endPoint, QPainter &painter, const QPoint &startPoint)
+void PencilTool::drawLineTo(const QPoint &endPoint, QPainter &painter)
 {
     painter.setPen(QPen(m_penColor, m_penWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    painter.drawLine(startPoint, endPoint);
+    painter.drawLine(m_lastPoint, endPoint);
 }

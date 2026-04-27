@@ -9,12 +9,12 @@ class PencilTool : public Tool
 public:
     explicit PencilTool(QObject *parent = nullptr);
 
-    void onMousePress(QMouseEvent *event, QPainter &painter, const QPoint &lastPoint) override;
-    void onMouseMove(QMouseEvent *event, QPainter &painter, const QPoint &lastPoint) override;
-    void onMouseRelease(QMouseEvent *event, QPainter &painter, const QPoint &lastPoint) override;
+    void onMousePress(QMouseEvent *event, QPainter &painter) override;
+    void onMouseMove(QMouseEvent *event, QPainter &painter) override;
+    void onMouseRelease(QMouseEvent *event, QPainter &painter) override;
 
 private:
-    void drawLineTo(const QPoint &endPoint, QPainter &painter, const QPoint &startPoint);
+    void drawLineTo(const QPoint &endPoint, QPainter &painter);
 
     bool m_scribbling = false;
     QPoint m_lastPoint;

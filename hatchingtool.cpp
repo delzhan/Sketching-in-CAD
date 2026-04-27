@@ -9,25 +9,22 @@ HatchingTool::HatchingTool(QObject *parent) : Tool(parent)
 {
 }
 
-void HatchingTool::onMousePress(QMouseEvent *event, QPainter &painter, const QPoint &lastPoint)
+void HatchingTool::onMousePress(QMouseEvent *event, QPainter &painter)
 {
     Q_UNUSED(painter);
-    Q_UNUSED(lastPoint);
     if (event->button() == Qt::LeftButton) {
         m_isDrawing = true;
     }
 }
 
-void HatchingTool::onMouseMove(QMouseEvent *event, QPainter &painter, const QPoint &lastPoint)
+void HatchingTool::onMouseMove(QMouseEvent *event, QPainter &painter)
 {
     Q_UNUSED(event);
     Q_UNUSED(painter);
-    Q_UNUSED(lastPoint);
 }
 
-void HatchingTool::onMouseRelease(QMouseEvent *event, QPainter &painter, const QPoint &lastPoint)
+void HatchingTool::onMouseRelease(QMouseEvent *event, QPainter &painter)
 {
-    Q_UNUSED(lastPoint);
     if (event->button() == Qt::LeftButton && m_isDrawing) {
         m_isDrawing = false;
         QPoint clickPoint = event->pos();

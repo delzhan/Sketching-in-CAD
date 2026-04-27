@@ -25,9 +25,9 @@ public:
 
     explicit HatchingTool(QObject *parent = nullptr);
 
-    void onMousePress(QMouseEvent *event, QPainter &painter, const QPoint &lastPoint) override;
-    void onMouseMove(QMouseEvent *event, QPainter &painter, const QPoint &lastPoint) override;
-    void onMouseRelease(QMouseEvent *event, QPainter &painter, const QPoint &lastPoint) override;
+    void onMousePress(QMouseEvent *event, QPainter &painter) override;
+    void onMouseMove(QMouseEvent *event, QPainter &painter) override;
+    void onMouseRelease(QMouseEvent *event, QPainter &painter) override;
 
     void setHatchAngle(int angle) { m_hatchAngle = angle; }
     void setHatchSpacing(int spacing) { m_hatchSpacing = spacing; }
@@ -40,19 +40,15 @@ public:
     HatchType getHatchType() const { return m_hatchType; }
 
 private:
-    // Основной метод заливки области штриховкой (точная копия логики из ScribbleArea)
     void floodFillHatch(const QPoint &startPoint, QImage &image, QPainter &painter);
 
-    // Рисование штриховки на отдельном изображении (как в drawCrossHatching и hatchArea)
     void drawHatchOnImage(QImage &hatchImage, int width, int height);
 
-    // Параметры штриховки
     int m_hatchAngle = 45;
     int m_hatchSpacing = 10;
     bool m_crossHatching = false;
     HatchType m_hatchType = Metal;
 
-    // Состояние инструмента
     bool m_isDrawing = false;
 };
 

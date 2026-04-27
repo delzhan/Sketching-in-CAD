@@ -13,9 +13,9 @@ public:
     explicit Tool(QObject *parent = nullptr);
     virtual ~Tool() = default;
 
-    virtual void onMousePress(QMouseEvent *event, QPainter &painter, const QPoint &lastPoint) = 0;
-    virtual void onMouseMove(QMouseEvent *event, QPainter &painter, const QPoint &lastPoint) = 0;
-    virtual void onMouseRelease(QMouseEvent *event, QPainter &painter, const QPoint &lastPoint) = 0;
+    virtual void onMousePress(QMouseEvent *event, QPainter &painter) = 0;
+    virtual void onMouseMove(QMouseEvent *event, QPainter &painter) = 0;
+    virtual void onMouseRelease(QMouseEvent *event, QPainter &painter) = 0;
 
     virtual void setPenColor(const QColor &color) { m_penColor = color; }
     virtual void setPenWidth(int width) { m_penWidth = width; }

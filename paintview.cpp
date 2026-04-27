@@ -142,7 +142,7 @@ void PaintView::mousePressEvent(QMouseEvent *event)
     QPainter painter(&m_image);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    m_currentTool->onMousePress(event, painter, m_lastPoint);
+    m_currentTool->onMousePress(event, painter);
 
     m_modified = true;
     update();
@@ -156,7 +156,7 @@ void PaintView::mouseMoveEvent(QMouseEvent *event)
         QPainter painter(&m_image);
         painter.setRenderHint(QPainter::Antialiasing, true);
 
-        m_currentTool->onMouseMove(event, painter, m_lastPoint);
+        m_currentTool->onMouseMove(event, painter);
 
         m_lastPoint = event->pos();
         m_modified = true;
@@ -171,7 +171,7 @@ void PaintView::mouseReleaseEvent(QMouseEvent *event)
     QPainter painter(&m_image);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    m_currentTool->onMouseRelease(event, painter, m_lastPoint);
+    m_currentTool->onMouseRelease(event, painter);
 
     m_modified = true;
     update();
